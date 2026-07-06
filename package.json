@@ -1,0 +1,38 @@
+{
+    "name": "browsermind",
+    "version": "0.0.1",
+    "description": "Build AI agents that can browse the web, interact with websites, extract data, and automate workflows using secure sandboxed browsers.",
+    "main": "index.js",
+    "scripts": {
+        "dev": "nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
+        "start": "ts-node -r tsconfig-paths/register src/index.ts"
+    },
+    "keywords": [
+        "AI",
+        "agents",
+        "web automation",
+        "browser automation",
+        "data extraction",
+        "workflow automation",
+        "sandboxed browsers",
+        "secure browsing",
+        "web scraping",
+        "task automation"
+    ],
+    "author": "Maitrek Patel",
+    "license": "MIT",
+    "type": "module",
+    "dependencies": {
+        "@langchain/core": "^1.2.1",
+        "@langchain/langgraph": "^1.4.7",
+        "dotenv": "^17.4.2",
+        "express": "^5.2.1",
+        "langchain": "^1.5.2",
+        "mongoose": "^9.7.4"
+    },
+    "devDependencies": {
+        "nodemon": "^3.1.14",
+        "ts-node": "^10.9.2",
+        "typescript": "^6.0.3"
+    }
+}
