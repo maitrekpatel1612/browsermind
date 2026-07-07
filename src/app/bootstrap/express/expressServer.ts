@@ -8,6 +8,8 @@ import passport from 'passport';
 import session from 'express-session';
 import {Strategy as GoogleStrategy} from 'passport-google-oauth20';
 import { UserService } from '@/services/UserService';
+import { postChatStream } from '@/http/controllers/chatController';
+import { BrowserAgent } from '@/browser-agent/BrowserAgents';
 
 export function expressServer(app : Express, PORT : number) : void {
     
@@ -128,6 +130,18 @@ export function expressServer(app : Express, PORT : number) : void {
             });
         });
     });
+
+    // Chat Stream route
+    app.use('/chat', postChatStream)
+
+    //
+    app.get('/test', async (req : Request, res : Response , next : NextFunction) => {
+        
+        const {invokeBrowserAgent} = await BrowserAgent()
+        const fullContent = await invokeBrowserAgent("Visit the url and tell me what is the content of the page https://maitrekpatel.in and give me a summary of the content in 3 sentences.")
+        res.json({result : fullContent})
+    })
+
 
     //~ Start Express Server 
     app.listen(PORT, () => {

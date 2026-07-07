@@ -22,17 +22,23 @@
     "author": "Maitrek Patel",
     "license": "MIT",
     "dependencies": {
+        "@langchain/cerebras": "^1.0.4",
+        "@langchain/community": "^1.1.29",
         "@langchain/core": "^1.2.1",
+        "@langchain/exa": "^1.0.2",
+        "@langchain/fireworks": "^0.2.3",
         "@langchain/langgraph": "^1.4.7",
+        "cheerio": "^1.2.0",
         "connect-mongo": "^6.0.0",
         "cors": "^2.8.6",
-        "dotenv": "^17.4.2",
+        "dotenv": "^16.4.5",
         "express": "^5.2.1",
         "express-session": "^1.19.0",
         "langchain": "^1.5.2",
         "mongoose": "^9.7.4",
         "passport": "^0.7.0",
-        "passport-google-oauth20": "^2.0.0"
+        "passport-google-oauth20": "^2.0.0",
+        "zod": "^4.4.3"
     },
     "devDependencies": {
         "@types/cors": "^2.8.19",
