@@ -5,7 +5,8 @@
     "main": "index.js",
     "scripts": {
         "dev": "nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
-        "start": "ts-node -r tsconfig-paths/register src/index.ts"
+        "start": "ts-node -r tsconfig-paths/register src/index.ts",
+        "playwright": "ts-node -r tsconfig-paths/register src/learn.ts"
     },
     "keywords": [
         "AI",
@@ -38,6 +39,9 @@
         "mongoose": "^9.7.4",
         "passport": "^0.7.0",
         "passport-google-oauth20": "^2.0.0",
+        "playwright": "^1.61.1",
+        "playwright-extra": "^4.3.6",
+        "puppeteer-extra-plugin-stealth": "^2.11.2",
         "zod": "^4.4.3"
     },
     "devDependencies": {
