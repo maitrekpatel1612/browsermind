@@ -1,7 +1,7 @@
 import {createAgent , HumanMessage} from 'langchain';
 import { BASE_SYSTEM_PROMPT } from './prompt/prompt';
 import { LLM } from '@/llm/LLM';
-import { searchTools } from '@/tools/webTools';
+import { searchTools } from '@/tools/search/webTools';
 import { toolMonitoringMiddleware } from '@/app/middleware/toolMonitoring';
 
 export async function BrowserAgent() 
