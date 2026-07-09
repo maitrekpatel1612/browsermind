@@ -26,7 +26,7 @@ function pick<T>(arr: T[]): T {
     return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function randInt(min: number, max: number): number { return Math.floor(Math.random() * (max - min + 1)) + min; }
+export function randInt(min: number, max: number): number { return Math.floor(Math.random() * (max - min + 1)) + min; }
 
 export interface DialogInfo {
     type : string;
@@ -386,4 +386,4 @@ export class BrowserManager {
 }
 
 
-export const browserMngr = new BrowserManager();
+export const browserManager = new BrowserManager();
