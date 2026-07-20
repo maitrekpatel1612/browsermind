@@ -1,7 +1,7 @@
 import {browserManager} from "@/browser/BrowserManager";
 import {tool} from "@langchain/core/tools";
 import {z} from "zod";
-import {humanDelay , shortPause} from "@/utils/mediumPause";
+import {humanDelay , shortPause} from "@/utils/humanBehaviour";
 import { withRetry } from "@/utils/withRetry";
 import {Page} from "playwright";
 

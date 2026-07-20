@@ -1,4 +1,4 @@
-import { mediumPause } from "@/utils/mediumPause";
+import { mediumPause } from "@/utils/humanBehaviour";
 import { withRetry } from "@/utils/withRetry";
 import {tool} from "@langchain/core/tools";
 import {browserManager} from "@/browser/BrowserManager";

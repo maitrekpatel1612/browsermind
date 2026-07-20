@@ -1,11 +1,9 @@
 import type { Page } from "playwright";
+import { randInt } from "@/browser/BrowserManager";
 
 export function humanDelay(minMs: number = 80, maxMs: number = 250): Promise<void> {
-    const delay = Math.floor(Math.random() * (maxMs - minMs + 1)) + minMs;
-    return new Promise(resolve => setTimeout(resolve, delay));
+    return new Promise(resolve => setTimeout(resolve, randInt(minMs, maxMs)));
 }
-
-export const shortPause = () => humanDelay(100, 400);
 
 export async function humanMouseMove(page: Page, x: number, y: number): Promise<void> {
     const steps = Math.max(8, Math.min(25, Math.round(Math.hypot(x, y) / 50)));
@@ -30,3 +28,8 @@ export async function humanType(
         await humanDelay(timing.min, timing.max);
     }
 }
+
+
+export const shortPause = () => humanDelay(100, 400);
+export const mediumPause = () => humanDelay(500, 1200);
+export const longPause = () => humanDelay(1500, 3000);

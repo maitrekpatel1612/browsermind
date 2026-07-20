@@ -1,5 +1,5 @@
 import {browserManager} from "@/browser/BrowserManager";
-import { shortPause } from "@/utils/mediumPause";
+import { shortPause } from "@/utils/humanBehaviour";
 import {tool} from "@langchain/core/tools";
 import {z} from "zod";
 

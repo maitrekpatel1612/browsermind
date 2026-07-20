@@ -1,5 +1,5 @@
 import {browserManager} from "@/browser/BrowserManager";
-import {humanDelay} from "@/utils/mediumPause";
+import {humanDelay} from "@/utils/humanBehaviour";
 import {tool} from "@langchain/core/tools";
 import {z} from "zod";
 
