@@ -1,57 +1,51 @@
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
 import { browserManager } from "@/browser/BrowserManager";
-import { humanDelay } from "../utils/humanBehavior";
+import { humanDelay } from "@/utils/humanBehaviour";
 
 export const scrollTool = tool(
   async ({ direction, amount, selector }) => {
-    try 
-    {
-        const page = browserManager.getPage();
-        const px = (amount ?? 3) * 400; // 1 unit ≈ 400px
+    try {
+      const page = browserManager.getPage();
+      const px = (amount ?? 3) * 400; // 1 unit ≈ 400px
 
-        if (selector) 
-        {
-            await page.locator(selector).first().evaluate(
-            (el, { dir, pixels }) => 
-            {
-                el.scrollBy({
-                    top: dir === "down" ? pixels : dir === "up" ? -pixels : 0,
-                    left: dir === "right" ? pixels : dir === "left" ? -pixels : 0,
-                });
-            },{ dir: direction, pixels: px });
-        } 
-        else 
-        {
-            await page.evaluate(
-                ({ dir, pixels }) => 
-                {
-                    window.scrollBy({
-                        top: dir === "down" ? pixels : dir === "up" ? -pixels : 0,
-                        left: dir === "right" ? pixels : dir === "left" ? -pixels : 0,
-                    });
-                },
-                { dir: direction, pixels: px }
-            );
-        }
+      if (selector) {
+        await page.locator(selector).first().evaluate(
+          (el, { dir, pixels }) => {
+            el.scrollBy({
+              top: dir === "down" ? pixels : dir === "up" ? -pixels : 0,
+              left: dir === "right" ? pixels : dir === "left" ? -pixels : 0,
+            });
+          }, { dir: direction, pixels: px });
+      }
+      else {
+        await page.evaluate(
+          ({ dir, pixels }) => {
+            window.scrollBy({
+              top: dir === "down" ? pixels : dir === "up" ? -pixels : 0,
+              left: dir === "right" ? pixels : dir === "left" ? -pixels : 0,
+            });
+          },
+          { dir: direction, pixels: px }
+        );
+      }
 
-        await humanDelay(400, 800);
+      await humanDelay(400, 800);
 
-        const pos = await page.evaluate(() => ({
-            x: window.scrollX,
-            y: window.scrollY,
-            maxY: document.documentElement.scrollHeight - window.innerHeight,
-        }));
+      const pos = await page.evaluate(() => ({
+        x: window.scrollX,
+        y: window.scrollY,
+        maxY: document.documentElement.scrollHeight - window.innerHeight,
+      }));
 
-        return JSON.stringify({
-            success: true,
-            position: pos,
-            message: `Scrolled ${direction} ~${px}px. Position: (${pos.x}, ${pos.y})`,
-        });
-        
-    } 
-    catch (err) 
-    {
+      return JSON.stringify({
+        success: true,
+        position: pos,
+        message: `Scrolled ${direction} ~${px}px. Position: (${pos.x}, ${pos.y})`,
+      });
+
+    }
+    catch (err) {
       return JSON.stringify({
         success: false,
         error: String(err),

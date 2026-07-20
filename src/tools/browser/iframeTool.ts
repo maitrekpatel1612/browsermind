@@ -1,5 +1,5 @@
   /**
- * #1 iframe.tool.ts — switch into/out of iframes
+ * #1 iframe.tool.ts — switch into/out of iframes [Means to interact with embedded content like payment forms, login popups, or widgets]
  */
 
 import { tool } from "@langchain/core/tools";

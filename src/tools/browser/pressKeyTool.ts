@@ -18,6 +18,7 @@ export const pressKeyTool = tool(
                 if (times > 1) await humanDelay(80, 150);
             }
 
+            await page.waitForTimeout(1000); // Wait for any resulting actions to complete
             return JSON.stringify({
                 success: true,
                 message: `Pressed "${key}"${times > 1 ? ` × ${times}` : ""}`,

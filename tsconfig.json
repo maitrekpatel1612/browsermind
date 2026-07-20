@@ -1,20 +1,24 @@
 {
   "compilerOptions": {
-    "target": "ES6",
+    "target": "ES2022",
     "module": "commonjs",
     "moduleResolution": "node",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
-    "outDir": "dist",
-    "rootDir": "src",
-    "ignoreDeprecations": "6.0",
+    "types": [
+      "node"
+    ],
     "baseUrl": ".",
     "paths": {
       "@/*": [
-        "src/*"
+        "src/*",
+        "utils/*"
       ]
     },
+    "rootDir": "src",
+    "outDir": "dist",
+    "ignoreDeprecations": "6.0"
   },
   "include": [
     "src"

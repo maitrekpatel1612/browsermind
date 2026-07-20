@@ -1,20 +1,18 @@
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
 import { browserManager } from "@/browser/BrowserManager";
-import { shortPause } from "../utils/humanBehavior";
+import { shortPause } from "@/utils/humanBehaviour";
 import { withRetry } from "@/utils/withRetry";
 
 export const selectOptionTool = tool(
-  async ({ selector, ariaLabel, value, label, index }) => 
-    {
-        return withRetry(async () => 
-        {
+    async ({ selector, ariaLabel, value, label, index }) => {
+        return withRetry(async () => {
             const page = browserManager.getPage();
             await shortPause();
 
             const locator = ariaLabel
-            ? page.getByLabel(ariaLabel).first()
-            : selector ? page.locator(selector).first() : null
+                ? page.getByLabel(ariaLabel).first()
+                : selector ? page.locator(selector).first() : null
 
 
             if (!locator)
@@ -45,20 +43,20 @@ export const selectOptionTool = tool(
 
 
         }, { attempts: 3 }).catch((e: Error) =>
-        JSON.stringify({
-            success: false,
-            error: String(e),
-        }));
+            JSON.stringify({
+                success: false,
+                error: String(e),
+            }));
     },
     {
         name: "select_option",
         description: "Select an option from a <select> dropdown by value, visible label text, or 0-based index.",
         schema: z.object({
-        selector: z.string().optional().describe("CSS selector of <select>"),
-        ariaLabel: z.string().optional().describe("aria-label of <select> (preferred)"),
-        value: z.string().optional().describe("Option value attribute"),
-        label: z.string().optional().describe("Option visible text"),
-        index: z.number().optional().describe("0-based index"),
+            selector: z.string().optional().describe("CSS selector of <select>"),
+            ariaLabel: z.string().optional().describe("aria-label of <select> (preferred)"),
+            value: z.string().optional().describe("Option value attribute"),
+            label: z.string().optional().describe("Option visible text"),
+            index: z.number().optional().describe("0-based index"),
         }),
     }
 );

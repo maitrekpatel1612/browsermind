@@ -4,9 +4,10 @@
     "description": "Build AI agents that can browse the web, interact with websites, extract data, and automate workflows using secure sandboxed browsers.",
     "main": "index.js",
     "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
         "dev": "nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
         "start": "ts-node -r tsconfig-paths/register src/index.ts",
-        "playwright": "ts-node -r tsconfig-paths/register src/learn.ts"
+        "playwright": "ts-node -r tsconfig-paths/register src/test-browserTool.ts"
     },
     "keywords": [
         "AI",
@@ -23,6 +24,7 @@
     "author": "Maitrek Patel",
     "license": "MIT",
     "dependencies": {
+        "@cerebras/cerebras_cloud_sdk": "^1.91.0",
         "@langchain/cerebras": "^1.0.4",
         "@langchain/community": "^1.1.29",
         "@langchain/core": "^1.2.1",
@@ -48,6 +50,7 @@
         "@types/cors": "^2.8.19",
         "@types/express": "^5.0.6",
         "@types/express-session": "^1.19.0",
+        "@types/node": "^26.1.1",
         "@types/passport": "^1.0.17",
         "@types/passport-google-oauth20": "^2.0.1",
         "nodemon": "^3.1.14",

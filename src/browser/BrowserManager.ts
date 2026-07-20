@@ -1,9 +1,10 @@
-import {chromium} from 'playwright-extra';
+import { chromium } from 'playwright-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
-import type {Browser, BrowserContext, Page, Frame, Dialog} from 'playwright';
+import type { Browser, BrowserContext, Page, Frame, Dialog } from 'playwright';
 import path from "path";
 import fs from "fs";
 import { randomInt } from 'crypto';
+import "dotenv/config";
 
 // User agents to randomize the browser fingerprint and avoid detection (to blend in with normal user traffic)
 const USER_AGENTS = [
@@ -29,48 +30,47 @@ function pick<T>(arr: T[]): T {
 export function randInt(min: number, max: number): number { return Math.floor(Math.random() * (max - min + 1)) + min; }
 
 export interface DialogInfo {
-    type : string;
-    message : string;
-    defaultValue? : string;
+    type: string;
+    message: string;
+    defaultValue?: string;
 }
 
 export class BrowserManager {
-    private browser : Browser | null = null;
-    private context : BrowserContext | null = null;
-    private _page : Page | null = null;
-    private _pages : Page[] = []; // Array to hold multiple pages of the same browser context   #2 all open tabs support
-    private _activePageIndex : number = 0; // Index of the currently active page in the _pages array
-    private _activeFrame : Frame | null = null; // Currently active frame in the active page (iFrame support)   #1 iframe support
-    private _lastDialog : DialogInfo | null = null; // Store the last dialog information
-    private _idleTimer : ReturnType<typeof setInterval> | null = null; // Timer to track idle time
+    private browser: Browser | null = null;
+    private context: BrowserContext | null = null;
+    private _page: Page | null = null;
+    private _pages: Page[] = []; // Array to hold multiple pages of the same browser context   #2 all open tabs support
+    private _activePageIndex: number = 0; // Index of the currently active page in the _pages array
+    private _activeFrame: Frame | null = null; // Currently active frame in the active page (iFrame support)   #1 iframe support
+    private _lastDialog: DialogInfo | null = null; // Store the last dialog information
+    private _idleTimer: ReturnType<typeof setInterval> | null = null; // Timer to track idle time
 
     // Track the last mouse position to simulate human-like mouse movements
     public lastMouseX = 0;
     public lastMouseY = 0;
 
     // Configuration options for the browser manager to control its behavior and performance
-    private readonly headless : boolean;
-    private readonly slowMo : number;
-    private readonly timeout : number;
-    private readonly sessionDir : string;
-    private readonly sessionName : string;
-    private readonly viewport : { width: number, height: number };
-    private readonly userAgent : string;
+    private readonly headless: boolean;
+    private readonly slowMo: number;
+    private readonly timeout: number;
+    private readonly sessionDir: string;
+    private readonly sessionName: string;
+    private readonly viewport: { width: number, height: number };
+    private readonly userAgent: string;
 
-    constructor()
-    {
+    constructor() {
         this.headless = process.env.HEADLESS !== 'false'; // Default to true unless explicitly set to 'false'
-        this.slowMo = parseInt(process.env.SLOW_MO ?? "50" , 10); // Default to 50ms unless specified in the environment variable 
-        this.timeout = parseInt(process.env.TIMEOUT ?? '30000' , 10);
+        this.slowMo = parseInt(process.env.SLOW_MO ?? "50", 10); // Default to 50ms unless specified in the environment variable 
+        this.timeout = parseInt(process.env.TIMEOUT ?? '30000', 10);
         this.sessionDir = process.env.SESSION_DIR || './sessions';
         this.sessionName = process.env.SESSION_NAME || 'default';
         this.viewport = pick(VIEWPORTS);
         this.userAgent = pick(USER_AGENTS);
     }
 
-    private getSessionPath() : string {
+    private getSessionPath(): string {
         const resolvedSessionDir = path.resolve(this.sessionDir);
-        if(!fs.existsSync(resolvedSessionDir)) {
+        if (!fs.existsSync(resolvedSessionDir)) {
             fs.mkdirSync(resolvedSessionDir, { recursive: true });
         }
         return path.join(resolvedSessionDir, `${this.sessionName}.json`);
@@ -78,15 +78,15 @@ export class BrowserManager {
 
 
     // Initialize the browser with stealth plugin and set up the context and page
-    async launchBrowser() : Promise<void> {
-        if(this.browser) return; // Browser is already launched
+    async launchBrowser(): Promise<void> {
+        if (this.browser) return; // Browser is already launched
 
         const sessionPath = this.getSessionPath(); // Get the path for the session storage
 
         this.browser = await chromium.launch({
-            headless : this.headless,
-            slowMo : this.slowMo,
-            args : [
+            headless: this.headless,
+            slowMo: this.slowMo,
+            args: [
                 // Get Chromium running inside Docker container or Linux servers as root user without sandboxing
                 '--no-sandbox',
                 '--disable-setuid-sandbox',
@@ -120,7 +120,7 @@ export class BrowserManager {
             ],
         });
 
-        
+
         const contextOptions: Parameters<Browser['newContext']>[0] = {
             viewport: this.viewport,
             userAgent: this.userAgent,
@@ -139,7 +139,7 @@ export class BrowserManager {
         }
 
         // Load session state if it exists to maintain cookies, local storage, and other session data across browser restarts
-        if(fs.existsSync(sessionPath)) {
+        if (fs.existsSync(sessionPath)) {
             contextOptions.storageState = sessionPath;
             console.log(`[Browser] Loaded session from ${sessionPath}`);
         }
@@ -150,15 +150,14 @@ export class BrowserManager {
         this.context.setDefaultNavigationTimeout(this.timeout);
 
         // Init Scrips (Inject into every page/frame)
-        await this.context.addInitScript(() => 
-        {
+        await this.context.addInitScript(() => {
             // Webdriver Flag 
             Object.defineProperty(navigator, 'webdriver', {
                 get: () => undefined,
             });
             // Plugins Flag
             Object.defineProperty(navigator, 'plugins', {
-                get : () => [{ name: 'Chrome PDF Plugin' }, { name: 'Chrome PDF Viewer' }, { name: 'Native Client' }],
+                get: () => [{ name: 'Chrome PDF Plugin' }, { name: 'Chrome PDF Viewer' }, { name: 'Native Client' }],
             });
 
             // Languages Flag
@@ -167,8 +166,8 @@ export class BrowserManager {
             });
 
             // Screen Flag (Define screen dimensions to match the viewport size and avoid detection based on screen size)
-            const vw = (window as unknown as {_vw?: number})._vw || screen.availWidth || 1920;
-            const vh = (window as unknown as {_vh?: number})._vh || screen.availHeight || 1080;
+            const vw = (window as unknown as { _vw?: number })._vw || screen.availWidth || 1920;
+            const vh = (window as unknown as { _vh?: number })._vh || screen.availHeight || 1080;
             // Override the screen properties to match the viewport size and avoid detection based on screen size
             Object.defineProperty(screen, 'width', { get: () => vw });
             Object.defineProperty(screen, 'height', { get: () => vh });
@@ -182,16 +181,16 @@ export class BrowserManager {
 
             // Chrome Object 
             (window as unknown as Record<string, unknown>).chrome = {
-                runtime : {}, loadTimes : () => ({}) , csi : () => ({}), app : {},
+                runtime: {}, loadTimes: () => ({}), csi: () => ({}), app: {},
             };
 
             // Permissions
             const originalQuery = window.navigator.permissions?.query;
-            if(originalQuery) {
-                window.navigator.permissions.query = (parameters : PermissionDescriptor) => 
-                parameters.name === 'notifications' 
-                ? Promise.resolve({ state: "denied" } as PermissionStatus) 
-                : originalQuery.call(window.navigator.permissions, parameters);
+            if (originalQuery) {
+                window.navigator.permissions.query = (parameters: PermissionDescriptor) =>
+                    parameters.name === 'notifications'
+                        ? Promise.resolve({ state: "denied" } as PermissionStatus)
+                        : originalQuery.call(window.navigator.permissions, parameters);
             }
 
             /**
@@ -205,11 +204,11 @@ export class BrowserManager {
              *  */
             //~ Bypass Canvas Fingerprinting
             const originalGetImageData = CanvasRenderingContext2D.prototype.getImageData;
-            
-            CanvasRenderingContext2D.prototype.getImageData = function(x, y, w, h) {
-            
+
+            CanvasRenderingContext2D.prototype.getImageData = function (x, y, w, h) {
+
                 const d = originalGetImageData.call(this, x, y, w, h);
-                for(let i = 0; i < d.data.length; i += 100) {
+                for (let i = 0; i < d.data.length; i += 100) {
                     d.data[i] = d.data[i] ^ 1; // XOR operation to add subtle noise to the pixel data [1 bit noise, imperceptible]
                 }
                 return d;
@@ -217,120 +216,120 @@ export class BrowserManager {
 
             //~ WebGL Vendor/Renderer - Prevent BotTracker from seeing your actual graphics card hardware
             const origGetParameter = WebGLRenderingContext.prototype.getParameter;
-            WebGLRenderingContext.prototype.getParameter = function(parameter : number) {
+            WebGLRenderingContext.prototype.getParameter = function (parameter: number) {
                 // UNMASKED_VENDOR_WEBGL
-                if(parameter === 37445)  return "Intel Inc.";
-                if(parameter === 37446) return "Intel Iris OpenGL Engine";
+                if (parameter === 37445) return "Intel Inc.";
+                if (parameter === 37446) return "Intel Iris OpenGL Engine";
                 return origGetParameter.call(this, parameter);
             }
 
         });
 
-            // We are creating a new page (tab) in the browser context. In Playwright, a BrowserContext can have multiple pages (tabs), and each page can be used to interact with different web pages independently. 
-            // By calling this.context.newPage(), we are opening a new tab in the browser where we can navigate to a URL, interact with elements, and perform various actions without affecting other pages in the same context.
-            this._page = await this.context.newPage();
-            this._pages = [this._page]; // Initialize the _pages array with the newly created page
+        // We are creating a new page (tab) in the browser context. In Playwright, a BrowserContext can have multiple pages (tabs), and each page can be used to interact with different web pages independently. 
+        // By calling this.context.newPage(), we are opening a new tab in the browser where we can navigate to a URL, interact with elements, and perform various actions without affecting other pages in the same context.
+        this._page = await this.context.newPage();
+        this._pages = [this._page]; // Initialize the _pages array with the newly created page
 
 
-            //~ Request Header Clenup
-            await this._page.route('**/*', async (route) => {
+        //~ Request Header Clenup
+        await this._page.route('**/*', async (route) => {
+            const headers = { ...route.request().headers() };
+            delete headers['x-playwright'];
+            delete headers['x-puppeteer'];
+            await route.continue({ headers });
+        });
+
+        //~ Dialog Handling (alert, confirm, prompt) - Automatically handle dialogs by storing the last dialog information and dismissing it to avoid blocking the script execution
+        this._page.on('dialog', async (dialog: Dialog) => {
+            this._lastDialog = {
+                type: dialog.type(),
+                message: dialog.message(),
+                defaultValue: dialog.defaultValue(),
+            };
+            console.log(`[Browser] Dialog detected: ${dialog.type()} - "${dialog.message()}"`);
+            // Automatically dismiss by default (agent can ovveride via handle_dialog tool) 
+            await dialog.accept();
+        });
+        //~ New Tab / Popup Handler
+        this.context?.on("page", async (newPage: Page) => {
+            console.log(`[Browser] New page opened: ${newPage.url()}`);
+            this._pages.push(newPage);
+
+            // Handle dialogs in the new page (tab) and store the last dialog information
+            newPage.on("dialog", async (dialog: Dialog) => {
+                this._lastDialog = { type: dialog.type(), message: dialog.message() };
+                await dialog.accept();
+            });
+
+            // Clean up request headers in the new page to avoid detection by removing Playwright-specific headers
+            await newPage.route('**/*', async (route) => {
                 const headers = { ...route.request().headers() };
                 delete headers['x-playwright'];
                 delete headers['x-puppeteer'];
                 await route.continue({ headers });
-            });
-
-            //~ Dialog Handling (alert, confirm, prompt) - Automatically handle dialogs by storing the last dialog information and dismissing it to avoid blocking the script execution
-            this._page.on('dialog', async (dialog : Dialog) => {
-                this._lastDialog = {
-                    type : dialog.type(),
-                    message : dialog.message(),
-                    defaultValue : dialog.defaultValue(),
-                };
-                console.log(`[Browser] Dialog detected: ${dialog.type()} - "${dialog.message()}"`);
-                // Automatically dismiss by default (agent can ovveride via handle_dialog tool) 
-                await dialog.accept();
-            });
-            //~ New Tab / Popup Handler
-            this.context?.on("page", async (newPage : Page) => {
-                console.log(`[Browser] New page opened: ${newPage.url()}`);
-                this._pages.push(newPage);
-
-                // Handle dialogs in the new page (tab) and store the last dialog information
-                newPage.on("dialog", async (dialog : Dialog) => {
-                    this._lastDialog = {type : dialog.type(), message : dialog.message() };
-                    await dialog.accept();
-                });
-
-                // Clean up request headers in the new page to avoid detection by removing Playwright-specific headers
-                await newPage.route('**/*', async (route) => {
-                    const headers = { ...route.request().headers() };
-                    delete headers['x-playwright'];
-                    delete headers['x-puppeteer'];
-                    await route.continue({ headers });
-                })
-            });
+            })
+        });
 
 
-            //~ Idle Behaviour - Random Micro-movements every 8-20s
-            if(!this.headless) {
-                this._idleTimer = setInterval(async () => {
-                    const x = randInt(200, this.viewport.width - 200);
-                    const y = randInt(200, this.viewport.height - 200);
-                    try{
-                        await this._page?.mouse.move(x, y, { steps: randInt(3, 8) });
-                        this.lastMouseX = x;
-                        this.lastMouseY = y;
-                    }
-                    catch{
-                        // Ignore errors if the page is closed or not available
-                    }
-                }, randInt(8000, 20000)); // Random interval between 8-20 seconds
-            }
+        //~ Idle Behaviour - Random Micro-movements every 8-20s
+        if (!this.headless) {
+            this._idleTimer = setInterval(async () => {
+                const x = randInt(200, this.viewport.width - 200);
+                const y = randInt(200, this.viewport.height - 200);
+                try {
+                    await this._page?.mouse.move(x, y, { steps: randInt(3, 8) });
+                    this.lastMouseX = x;
+                    this.lastMouseY = y;
+                }
+                catch {
+                    // Ignore errors if the page is closed or not available
+                }
+            }, randInt(8000, 20000)); // Random interval between 8-20 seconds
+        }
 
-            console.log(`[Browser] Launched Browser (headless = ${this.headless})  , Viewport: ${this.viewport.width}x${this.viewport.height}`);
-            // Return acative frame (if any) or the main page as the active frame for further interactions 
+        console.log(`[Browser] Launched Browser (headless = ${this.headless})  , Viewport: ${this.viewport.width}x${this.viewport.height}`);
+        // Return acative frame (if any) or the main page as the active frame for further interactions 
 
     }
 
     // Get the currently active page (tab) in the browser context. If no page is initialized, throw an error.
-    getPage() : Page {
-        if(!this._page) throw new Error("Browser page is not initialized. Call launchBrowser() first.");
+    getPage(): Page {
+        if (!this._page) throw new Error("Browser page is not initialized. Call launchBrowser() first.");
         return this._pages[this._activePageIndex] ?? this._page;
     }
 
     // Get the currently active frame (iFrame) in the active page. If no frame is active, return the main page as the active frame.
-    getFrame() : Frame | Page {
+    getFrame(): Frame | Page {
         return this._activeFrame ?? this.getPage();
     }
-    
+
     getContent(): Promise<string> {
         return this.getFrame().content();
     }
     // Get the browser context. If the context is not initialized, throw an error.
-    getContext() : BrowserContext {
-        if(!this.context) throw new Error("Browser context is not initialized. Call launchBrowser() first.");
+    getContext(): BrowserContext {
+        if (!this.context) throw new Error("Browser context is not initialized. Call launchBrowser() first.");
         return this.context;
     }
 
-    getAllPages() : Page[] { return [...this._pages]; }
+    getAllPages(): Page[] { return [...this._pages]; }
 
-    getActivePageIndex() : number { return this._activePageIndex; }
+    getActivePageIndex(): number { return this._activePageIndex; }
 
-    getLastDialog() : DialogInfo | null { return this._lastDialog; }
+    getLastDialog(): DialogInfo | null { return this._lastDialog; }
 
     /**
      *  Switch the iFrame
      *  */
 
-    async switchToFrame(selectorOrUrl : string) : Promise<boolean> {
+    async switchToFrame(selectorOrUrl: string): Promise<boolean> {
         const page = this.getPage();
 
         //Try by CSS Selector first
         const handle = await page.$(selectorOrUrl).catch(() => null);
-        if(handle) {
+        if (handle) {
             const frame = await handle.contentFrame();
-            if(frame) {
+            if (frame) {
                 this._activeFrame = frame;
                 console.log(`[Browser] Switched to iFrame with selector: ${selectorOrUrl}`);
                 return true;
@@ -339,7 +338,7 @@ export class BrowserManager {
 
         //Try by URL
         const frame = page.frames().find(f => f.url().includes(selectorOrUrl));
-        if(frame) {
+        if (frame) {
             this._activeFrame = frame;
             console.log(`[Browser] Switched to iFrame by URL: ${frame.url()}`);
             return true;
@@ -348,35 +347,35 @@ export class BrowserManager {
     }
 
 
-    switchToMainFrame() : void {
+    switchToMainFrame(): void {
         this._activeFrame = null;
         console.log(`[Browser] Switched back to main frame`);
     }
 
-    async switchToTab(index : number) : Promise<boolean> {
-        if(index < 0 || index >= this._pages.length) {
+    async switchToTab(index: number): Promise<boolean> {
+        if (index < 0 || index >= this._pages.length) {
             console.warn(`[Browser] Invalid tab index: ${index}. Total tabs: ${this._pages.length}`);
             return false;
-        }   
+        }
         this._activePageIndex = index;
         this._activeFrame = null; // Reset the active frame when switching tabs
-        try{
+        try {
             await this._pages[index].bringToFront();
         }
-        catch { /** Ignore catch */}
+        catch { /** Ignore catch */ }
         console.log(`[Browser] Switched to tab ${index} : ${this._pages[index].url()}`);
         return true;
     }
 
-    isLaunched() : boolean { 
-        return this.browser !== null; 
+    isLaunched(): boolean {
+        return this.browser !== null;
     }
 
-    async closeBrowser() : Promise<void> {
-        if(this._idleTimer) clearInterval(this._idleTimer);
-        for(const p of this._pages) { try { await p.close(); } catch {} }
-        await this.context?.close().catch(() => {});
-        await this.browser?.close().catch(() => {});
+    async closeBrowser(): Promise<void> {
+        if (this._idleTimer) clearInterval(this._idleTimer);
+        for (const p of this._pages) { try { await p.close(); } catch { } }
+        await this.context?.close().catch(() => { });
+        await this.browser?.close().catch(() => { });
         this._page = null;
         this._pages = [];
         this.context = null;
