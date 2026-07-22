@@ -1,6 +1,6 @@
 import { browserManager } from "@/browser/BrowserManager";
 import { humanType } from "@/utils/humanBehaviour";
-import { humanDelay, shortPause } from "@/utils/mediumPause";
+import { humanDelay, shortPause } from "@/utils/humanBehaviour";
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
 

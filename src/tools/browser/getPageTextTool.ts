@@ -1,18 +1,18 @@
-import {browserManager} from "@/browser/BrowserManager";
+import { browserManager } from "@/browser/BrowserManager";
 import { shortPause } from "@/utils/humanBehaviour";
-import {tool} from "@langchain/core/tools";
-import {z} from "zod";
+import { tool } from "@langchain/core/tools";
+import { z } from "zod";
 
 export const getPageTextTool = tool(
     async ({ selector, maxChars }) => {
         try {
             const page = browserManager.getPage();
-            let text : string;
-            if(selector){
+            let text: string;
+            if (selector) {
                 text = await page.locator(selector).first().innerText();
             }
-            else{
-                text = await page.evaluate(()=>{
+            else {
+                text = await page.evaluate(() => {
                     const c = document.body.cloneNode(true) as HTMLElement;
                     // Remove script and style elements
                     c.querySelectorAll('script, style,noscript').forEach(el => el.remove());
@@ -25,7 +25,20 @@ export const getPageTextTool = tool(
             return text.length > limit ? `${text.slice(0, limit)}\n...[truncated ${text.length - limit} chars]` : text;
 
         } catch (err) {
-            return `Error: ${String(err)}`;
+            const msg = String(err);
+            console.error('[get_page_text] error:', msg);
+            if (msg.includes('Target page') || msg.includes('browser has been closed')) {
+                try {
+                    console.log('[get_page_text] detected closed browser — attempting relaunch');
+                    await browserManager.closeBrowser().catch(() => { });
+                    await browserManager.launchBrowser();
+                    return `Error: ${msg} (recovered=true)`;
+                }
+                catch (e) {
+                    console.error('[get_page_text] relaunch failed', String(e));
+                }
+            }
+            return `Error: ${msg}`;
         }
     },
     {
@@ -36,7 +49,7 @@ export const getPageTextTool = tool(
             maxChars: z.number().optional().default(4000),
         }),
     }
-); 
+);
 
 
 

@@ -74,3 +74,6 @@ export class LLM {
     }
 
 }
+
+// Usagqe Example: 
+// const llm = LLM.getInstance("cerebras");

@@ -15,7 +15,21 @@ export const getPageInfoTool = tool(
             });
         }
         catch (err) {
-            return JSON.stringify({ error: String(err) })
+            const msg = String(err);
+            console.error('[get_page_info] error:', msg);
+            // If the browser/page was closed, try to relaunch once to recover session
+            if (msg.includes('Target page') || msg.includes('browser has been closed')) {
+                try {
+                    console.log('[get_page_info] detected closed browser — attempting relaunch');
+                    await browserManager.closeBrowser().catch(() => { });
+                    await browserManager.launchBrowser();
+                    return JSON.stringify({ error: msg, recovered: true });
+                }
+                catch (e) {
+                    console.error('[get_page_info] relaunch failed', String(e));
+                }
+            }
+            return JSON.stringify({ error: msg })
         }
     },
     {
@@ -26,7 +40,7 @@ export const getPageInfoTool = tool(
 )
 
 export const waitForElementTool = tool(
-    async ({ selector,text, state,  timeout, urlContains }) => {
+    async ({ selector, text, state, timeout, urlContains }) => {
         try {
             const page = browserManager.getPage();
             const ms = (timeout ?? 10) * 1000;
