@@ -14,10 +14,11 @@ const StateAnnotation = Annotation.Root({
     nextNode: Annotation(),
     pageStructure: Annotation(),
     pageInfo: Annotation(),
+    activeWebPage: Annotation(),
     fromNode: Annotation(),
 })
 
-
+ 
 
 // Workflow Graph
 const workflow = new StateGraph(StateAnnotation)

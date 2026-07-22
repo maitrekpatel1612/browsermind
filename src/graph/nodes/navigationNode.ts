@@ -8,13 +8,18 @@ import { navigateTool } from "@/tools/browser/navigateTool";
 import { getAccessibilityTreeTool } from "@/tools/browser/getAccessibilityTreeTool";
 import { LLM } from "@/llm/LLM";
 import { z } from "zod";
+import { removeThinkTag } from "@/utils/removeThinkTag";
 
 // Coordinator
 export const navigationAgentNode = async (state: any, config: any) => {
 
-    const lastMessage = state.messages[state.messages.length - 1];
+    const lastMessage = state.messages
+        .filter((m: any) => m?._getType?.() === "ai")
+        .slice(-1)[0];
 
-    const { weblink, userRequest, valid } = await getURL(lastMessage.content);
+    const cleanMessage = removeThinkTag(lastMessage?.content)
+    const browserInput = `Message from the BrowserAgent on behalf of the user : ${cleanMessage}\n`
+    const { weblink, userRequest, valid } = await getURL(`${browserInput}`);
 
     if (valid) {
 
@@ -22,6 +27,8 @@ export const navigationAgentNode = async (state: any, config: any) => {
         // Lauch Browser if not already launched
         await browserManager.launchBrowser();
 
+        const url = browserManager.isLaunched() ? browserManager.getPage().url() : "-";
+        console.log(`[navigationAgentNode] Browser Launched: ${browserManager.isLaunched()} | Current URL: ${url} | Navigating to: ${weblink}`);
         // Navigate tool
         await navigateTool.invoke({
             url: weblink,
@@ -29,7 +36,7 @@ export const navigationAgentNode = async (state: any, config: any) => {
         })
 
         // DimssiOverlays Tool
-        await dismissOverlaysTool.invoke({ force: true });
+        await dismissOverlaysTool.invoke({ force: false });
 
         // Full Accessibility Tree
         const [pageInfo, pageStructure] = await Promise.all([
@@ -43,8 +50,9 @@ export const navigationAgentNode = async (state: any, config: any) => {
 
         return new Command({
             update: {
-                pageStructure: pageStructure,
+                pageStructure: `Here is the accessibility tree of the page ${weblink} : \n\n\ ${pageStructure}`,
                 pageInfo: pageInfo,
+                activeWebPage: weblink,
                 messages: [
                     new HumanMessage(`
                     The navigator agent has visited this page ${weblink} and has retrieved the page information and accessibility tree.

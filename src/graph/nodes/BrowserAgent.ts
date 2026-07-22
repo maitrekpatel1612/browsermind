@@ -20,22 +20,26 @@ export const BrowserAgentNode = async (state: any, config: any) => {
     const { streamBrowserAgent } = await BrowserAgent();
 
     const chatHistory = [
-        ...state.messages,
+
         new HumanMessage(`
             <user_instructions>
+            
+                <active_web_page>
+                    This is the current open page or tab : ${state.activeWebPage}
+                </active_web_page>
 
-            <navigator_agent_message>
-            ${lastHumanMessage.content}
+                <navigator_agent_message>
+                    ${lastHumanMessage?.content}
 
-            <website_page_info?
-            ${state.pageInfo}
-            </website_page_info>
+                    <website_page_info?
+                        ${state.pageInfo}
+                    </website_page_info>
 
-            <website_accessibility_tree>
-            ${state.pageStructure}
-            </website_accessibility_tree>
+                    <website_accessibility_tree>
+                        ${state.pageStructure}
+                    </website_accessibility_tree>
 
-            </navigator_agent_message>
+                </navigator_agent_message>
             </user_instructions>
         `)
     ];
