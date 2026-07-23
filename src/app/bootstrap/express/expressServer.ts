@@ -10,6 +10,7 @@ import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { UserService } from '@/services/UserService';
 import { postChatStream } from '@/http/controllers/chatController';
 import { BrowserAgent } from '@/browser-agent/BrowserAgents';
+import { readChatHistoryTool } from '@/tools/chat-history/chathistoryTools';
 
 export function expressServer(app: Express, PORT: number): void {
 
@@ -136,9 +137,9 @@ export function expressServer(app: Express, PORT: number): void {
 
     //~ Agent Collaboration Routes 
     // Chat history route
-    // app.get('/chathistory', getChatHistory)
+    app.get('/chathistory', readChatHistoryTool.invoke);
     // Chat Stream route
-    app.get('/chat', postChatStream)
+    app.post('/chats', postChatStream)
 
     // Test route for Browser Agent
     app.get('/test', async (req: Request, res: Response, next: NextFunction) => {

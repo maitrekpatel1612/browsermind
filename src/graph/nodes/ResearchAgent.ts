@@ -6,7 +6,7 @@ import { searchTool } from "@/tools/search/webTools";
 
 
 // Coordinator
-export const ResearchAgent = async (state: any, config: any) => {
+export const researchAgentNode = async (state: any, config: any) => {
 
 
     const last = state.messages

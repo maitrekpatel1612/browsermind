@@ -63,7 +63,7 @@ export const writeToChatHistoryTool = tool(
 
         }
         catch (error) {
-            console.log("Failed to write into the chathistory.")
+            console.error("Failed to write into chat history:", error);
         }
     },
     {

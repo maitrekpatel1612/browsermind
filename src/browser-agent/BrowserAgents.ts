@@ -3,7 +3,7 @@ import { BASE_SYSTEM_PROMPT } from './prompt/prompt';
 import { LLM } from '@/llm/LLM';
 import { searchTools } from '@/tools/search/webTools';
 import { toolMonitoringMiddleware } from '@/app/middleware/toolMonitoring';
-import { delegateAgentTool } from '@/tools/browser/delegateTool';
+import { delegateAgentTool2 } from '@/tools/browser/delegateTool';
 import { clickTool } from '@/tools/browser/clickTool';
 import { hoverTool } from '@/tools/browser/hoverTool';
 import { typeTool } from '@/tools/browser/typeTool';
@@ -25,7 +25,7 @@ export async function BrowserAgent() {
         tools: [
             // Search Tools
             // ...searchTools,
-            delegateAgentTool,
+            delegateAgentTool2,
             // BrowserTools
             clickTool,
             hoverTool,

@@ -28,6 +28,13 @@ export function getNextNode(fullContent: string) {
         }
     }
 
+    else if (fullContent.includes("__TRANSFER_RESEARCHER_AGENT__")) {
+        return {
+            nextNode: "researchAgentNode",
+            shouldHandoff: true
+        }
+    }
+
 
     else {
         return {
