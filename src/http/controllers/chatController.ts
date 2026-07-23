@@ -6,17 +6,11 @@ import { uuidv7 } from "uuidv7";
 
 export const postChatStream = async (req: Request, res: Response) => {
     try {
-        // const { message, userId } = req.body;
-        // if (!message || !userId) {
-        //     return res.status(400).json({ ok: false, error: 'Missing message or userId in request body.' });
-        // }
+        const { message, userId } = req.body;
+        if (!message || !userId) {
+            return res.status(400).json({ ok: false, error: 'Missing message or userId in request body.' });
+        }
 
-        /**
-         * Testing : userId = "0001" and message = "Hello, how are you?"
-         */
-
-        const userId = "0001";
-        const message = "Hello, how are you?";
 
         // streaming response headers
         res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
@@ -31,18 +25,9 @@ export const postChatStream = async (req: Request, res: Response) => {
             (res as any).flush?.();
         };
 
-        /**
-         * Testing input : 
-         */
-        const testInput = `
-            visit:https://lilianweng.github.io/ 
-            Visit the FAQ Page and tell me the email that we should use to report errors
-        `;
 
 
-        //If exisitingThreadId is provided, continue the existing thread, else start a new thread
-        // const input: any = { messages: [{ role: "user", content: message }], userId };
-        const input = { messages: [new HumanMessage(testInput)], userId };
+        const input: any = { messages: [{ role: "user", content: message }], userId };
 
 
         const config = {
@@ -81,10 +66,6 @@ export const postChatStream = async (req: Request, res: Response) => {
             let lastNamespace = '';
 
             for await (const [namespace, chunk] of graphStream) {
-
-                console.log("========== STREAM ==========");
-                console.log("Namespace:", namespace);
-                console.dir(chunk, { depth: null });
 
                 // Emit agent lifecycle events when namespace changes
                 const nsString = Array.isArray(namespace) ? namespace.join('.') : String(namespace || '');

@@ -5,25 +5,17 @@ import { config } from "process";
 
 const AGENTS = [
     'navigationAgent',
-    'visionAgent',
-    'javascriptAgent',
-    'webscrapperAgent'
+    'ResearcherAgent',
 ]
 
-export const delegateAgentTool2 = tool(
+export const delegateAgentTool1 = tool(
     async ({ context, agent_name }, config) => {
         try {
             if (agent_name === "navigationAgent") {
                 return `<think>__TRANSFER_NAVIGATION_AGENT__ + ${context}</think>`;
             }
-            else if (agent_name === "visionAgent") {
-                return `<think>__TRANSFER_VISION_AGENT__ + ${context}</think>`;
-            }
-            else if (agent_name === "webscrapperAgent") {
-                return `<think>__TRANSFER_WEB_SCRAPPER_AGENT__ + ${context}</think>`;
-            }
-            else if (agent_name === "javascriptAgent") {
-                return `<think>__TRANSFER_JS_AGENT__ + ${context}</think>`;
+            else if (agent_name === "ResearcherAgent") {
+                return `<think>__TRANSFER_RESEARCHER_AGENT__ + ${context}</think>`;
             }
 
         }
@@ -41,10 +33,9 @@ export const delegateAgentTool2 = tool(
         The user wants you to check the example folder for the multi agent builder skill. They noticed that in some examples,
         where the icon prop is missing from tool objects that are passed to agents.
         </think>
-
         
         Note that you must have to follow this response format:
-
+        
         <think>__TRANSFER__ + context
         </think>
 

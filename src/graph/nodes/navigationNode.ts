@@ -13,13 +13,22 @@ import { removeThinkTag } from "@/utils/removeThinkTag";
 // Coordinator
 export const navigationAgentNode = async (state: any, config: any) => {
 
-    const lastMessage = state.messages
-        .filter((m: any) => m?._getType?.() === "ai")
-        .slice(-1)[0];
+    let browserInput = "";
+    const lastMessage = state.messages[state.messages.length - 1];
 
-    const cleanMessage = removeThinkTag(lastMessage?.content)
-    const browserInput = `Message from the BrowserAgent on behalf of the user : ${cleanMessage}\n`
+    if (lastMessage._getType() === "human") {
+        browserInput = lastMessage.content; //Initial user input from the human
+    }
+    else {
+        // BrowserAgent delegated back to NavigationAgent
+        browserInput =
+            `Message from the BrowserAgent on behalf of the user:\n` + removeThinkTag(lastMessage.content);
+    }
+
     const { weblink, userRequest, valid } = await getURL(`${browserInput}`);
+    console.log({
+        browserInput, weblink, userRequest
+    })
 
     if (valid) {
 

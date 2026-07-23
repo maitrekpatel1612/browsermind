@@ -4,7 +4,6 @@ import { BrowserAgent } from "@/browser-agent/BrowserAgents";
 import { getNextNode } from "@/utils/getNextNode";
 import { typeTool } from "@/tools/browser/typeTool";
 
-
 export const BrowserAgentNode = async (state: any, config: any) => {
     const { userId } = state;
 
@@ -20,7 +19,7 @@ export const BrowserAgentNode = async (state: any, config: any) => {
     const { streamBrowserAgent } = await BrowserAgent();
 
     const chatHistory = [
-
+        ...state.messages,
         new HumanMessage(`
             <user_instructions>
             
